@@ -54,7 +54,7 @@ bool MQTT::begin() {
     wsClient.setReconnectInterval(2000); // Reconnect interval
     mqttClient.begin(wsClient);
 
-    mqttClient.connect(id, username, "");
+    return mqttClient.connect(id, username, "")?true:false;
     delay(500);
 }
 
