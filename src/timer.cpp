@@ -1,11 +1,12 @@
 #include "timer.h"
 
-int iteration_1_sec = 0;
-int iteration_100_ms = 0;
 int iteration_1_ms = 0;
+int iteration_100_ms = 0;
+int iteration_1000_ms = 0;
 
-int iteration_1000_ms_core1 = 0;
 int iteration_1_ms_core1 = 0;
+int iteration_100_ms_core1 = 0;
+int iteration_1000_ms_core1 = 0;
 
 TaskHandle_t Task1, Task2;
 hw_timer_t *timerCore0 = NULL;

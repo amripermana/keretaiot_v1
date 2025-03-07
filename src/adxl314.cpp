@@ -1,31 +1,31 @@
 #include "adxl314.h"
 
-float accelX ;
-float accelY ;
-float accelZ ;
+// float accelX ;
+// float accelY ;
+// float accelZ ;
 
-void init_adxl314() { 
-    // Mengaktifkan mode pengukuran (bit 3 pada register 0x2D)
-  Wire.beginTransmission(I2C_ADDRESS);
-  Wire.write(0x2D);  // Register power control
-  Wire.write(0x08);  // Mengaktifkan mode pengukuran
-  byte result = Wire.endTransmission();
+// void init_adxl314() { 
+//     // Mengaktifkan mode pengukuran (bit 3 pada register 0x2D)
+//   Wire.beginTransmission(I2C_ADDRESS);
+//   Wire.write(0x2D);  // Register power control
+//   Wire.write(0x08);  // Mengaktifkan mode pengukuran
+//   byte result = Wire.endTransmission();
   
-  // Mengatur format data pada register DATA_FORMAT (0x31) jika diperlukan
-  Wire.beginTransmission(I2C_ADDRESS);
-  Wire.write(DATA_FORMAT);  // Mengakses register DATA_FORMAT
-  Wire.write(0x08);  // Set format 10-bit atau sesuai dengan kebutuhan sensor
-  result = Wire.endTransmission();
+//   // Mengatur format data pada register DATA_FORMAT (0x31) jika diperlukan
+//   Wire.beginTransmission(I2C_ADDRESS);
+//   Wire.write(DATA_FORMAT);  // Mengakses register DATA_FORMAT
+//   Wire.write(0x08);  // Set format 10-bit atau sesuai dengan kebutuhan sensor
+//   result = Wire.endTransmission();
 
-  if (!result) {
-    Serial.println("ADXL314 Initialized!");
-  } else {
-    Serial.println("Error initializing ADXL314");
-    while (true); // Berhenti jika inisialisasi gagal
-  }
-}
+//   if (!result) {
+//     Serial.println("ADXL314 Initialized!");
+//   } else {
+//     Serial.println("Error initializing ADXL314");
+//     while (true); // Berhenti jika inisialisasi gagal
+//   }
+// }
 
-float readAccelerometer(byte registerAddress) {
+float ADXL314::readAccelerometer(byte registerAddress) {
     Wire.beginTransmission(I2C_ADDRESS);
     Wire.write(registerAddress); // Mengakses register data (X, Y, atau Z)
     Wire.endTransmission();
@@ -50,9 +50,38 @@ float readAccelerometer(byte registerAddress) {
     }
   }
 
-void readAccelData() {
-    accelX = readAccelerometer(READ_X)*0.04883;
-    accelY = readAccelerometer(READ_Y)*0.04883;
-    accelZ = readAccelerometer(READ_Z)*0.04883;
+// void readAccelData() {
+//     accelX = readAccelerometer(READ_X)*0.04883;
+//     accelY = readAccelerometer(READ_Y)*0.04883;
+//     accelZ = readAccelerometer(READ_Z)*0.04883;
+// }
+
+void ADXL314::read() {
+  accelX = readAccelerometer(READ_X)*0.04883;
+  accelY = readAccelerometer(READ_Y)*0.04883;
+  accelZ = readAccelerometer(READ_Z)*0.04883;
+}
+
+bool ADXL314::begin() {
+  // Mengaktifkan mode pengukuran (bit 3 pada register 0x2D)
+  Wire.beginTransmission(I2C_ADDRESS);
+  Wire.write(0x2D);  // Register power control
+  Wire.write(0x08);  // Mengaktifkan mode pengukuran
+  byte result = Wire.endTransmission();
+  
+  // Mengatur format data pada register DATA_FORMAT (0x31) jika diperlukan
+  Wire.beginTransmission(I2C_ADDRESS);
+  Wire.write(DATA_FORMAT);  // Mengakses register DATA_FORMAT
+  Wire.write(0x08);  // Set format 10-bit atau sesuai dengan kebutuhan sensor
+  result = Wire.endTransmission();
+
+  if (!result) {
+    // Serial.println("ADXL314 Initialized!");
+    return true;
+  } else {
+    // Serial.println("Error initializing ADXL314");
+    // while (true); // Berhenti jika inisialisasi gagal
+    return false;
+  }
 }
 

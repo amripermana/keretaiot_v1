@@ -3,14 +3,20 @@
 #include <ESP32Time.h>
 #include "globalDef.h"
 
-#define CS_PIN 15
 
-extern ESP32Time rtc;
-extern String currentDate, prevDate;
-extern File file;
-
-
-void init_sdcard();
-void init_internalRTC();
-void update_fileLogger();
-void writeCSV(String data);
+class Datalogger{
+    private:
+        File file;
+        String currentDate, prevDate;
+        ESP32Time rtc;
+        char dataToSend[64];
+        void init_internalRTC();
+    public:
+        Datalogger(){
+            init_internalRTC();
+        };
+        String dateTime;
+        bool SD_STATE;
+        void checkFile();
+        bool write(master_data data);
+};

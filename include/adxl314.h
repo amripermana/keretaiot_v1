@@ -7,11 +7,24 @@
 #define READ_Z 0x36       // Register untuk membaca data Z
 #define DATA_FORMAT 0x31  // Register untuk mengatur format data
 
-extern float accelX ;
-extern float accelY ;
-extern float accelZ ;
+// extern float accelX ;
+// extern float accelY ;
+// extern float accelZ ;
 
-void init_adxl314();
-void readAccelData();
-float readAccelerometer(byte registerAddress);
+// void init_adxl314();
+// void readAccelData();
+// float readAccelerometer(byte registerAddress);
+
+class ADXL314 {
+    private:
+        float readAccelerometer(byte registerAddress);
+
+    public:
+        ADXL314(){};
+        float accelX ;
+        float accelY ;
+        float accelZ ;
+        bool begin();
+        void read();
+};
 

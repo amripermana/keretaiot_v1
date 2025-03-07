@@ -1,3 +1,6 @@
+#ifndef connection_H
+#define connection_H    
+
 #define TINY_GSM_MODEM_SIM7600
 
 #include <WiFi.h>
@@ -9,5 +12,8 @@
 // extern TinyGsmClient gsmClient;
          
 
-void connectWiFi(char* ssid, char* password);
-void SIM_init();
+bool connectWiFi(String ssid, String password);
+bool SIM_init();
+void start_internet();
+
+#endif
