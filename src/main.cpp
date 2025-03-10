@@ -189,7 +189,6 @@ void setup() {
   else{
     Serial.print("Firmware version : ");
     Serial.println(checkFirmwareVersion());
-    String str = "Firmware version : " + String(checkFirmwareVersion());
     inspector.log("INFO", "Firmware", "Firmware version : " + String(checkFirmwareVersion()));
   }
 
