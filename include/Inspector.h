@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <SD.h>
 #include <SPI.h>
+#include "globalDef.h"
 
 class Inspector {
     private:
@@ -11,11 +12,10 @@ class Inspector {
         File file;
         
     public:
-        bool inspector_stat;
         Inspector(){
             
         }
-        void log(String status, String func, String message);
+        void log(String state, String func, String message);
         bool create_log();
 };
 

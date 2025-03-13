@@ -1,6 +1,7 @@
 #include "config.h"
 
-bool load_config(const char* filename, config_data &configData) {
+
+bool Config::load(const char* filename, config_data &configData) {
     file = SD.open(filename, FILE_READ);
     if (file) {
         while (file.available()) {
@@ -28,7 +29,7 @@ bool load_config(const char* filename, config_data &configData) {
     }
 }
 
-void createDefaultConfig(){
+void Config::createDefault(config_data &config) {
     file = SD.open("/config.txt", FILE_WRITE);
     if(file){
         file.println("ssid=your_wifi_ssid");
@@ -40,6 +41,13 @@ void createDefaultConfig(){
     }
     else{
         Serial.println("(config file) : Failed to create config.txt, check SD card");
+        config.wifi_ssid = "hadehh";
+        config.wifi_password = "12345678";
+        config.mqttHost = "keretaiot-mqtt.doelengineering.cloud";
+        config.mqttPort = 8080;
+        config.mqttTopic = "v1/devices/me/telemetry";
+        config.mqttUsername = "mnh7mid3h8oe3qze6fq6";
+        config.deviceID = "20250307001";
     }
     
 }

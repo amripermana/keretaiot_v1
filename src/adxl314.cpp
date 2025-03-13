@@ -60,6 +60,7 @@ void ADXL314::read() {
   accelX = readAccelerometer(READ_X)*0.04883;
   accelY = readAccelerometer(READ_Y)*0.04883;
   accelZ = readAccelerometer(READ_Z)*0.04883;
+  // Serial.println(accelX);
 }
 
 bool ADXL314::begin() {

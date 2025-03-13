@@ -59,7 +59,6 @@ void downloadFirmware(){
   File dir = SD.open("/firmware");
   if (!dir || !dir.isDirectory()) {
     Serial.println("(download Firmware) : folder firmware tidak ditemukan");
-    return;
   }
   File file = dir.openNextFile();
   while (file) {
@@ -79,7 +78,6 @@ void downloadFirmware(){
   file = SD.open(ver, FILE_WRITE);
   if (!file) {
     Serial.println("(download Firmware) : initial write error");
-    return;
   }
   HTTPClient http;
   http.begin(serverUrl);

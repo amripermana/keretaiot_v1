@@ -10,28 +10,34 @@ TinyGsmClient gsmClient(modem);
 unsigned long wifi_timeout = 0;
 
 bool connectWiFi(String ssid, String password) {
-    Serial.print("(Wifi) : Connecting to WiFi");
-    WiFi.begin(ssid, password);
+    bool result = false;
+    Serial.print("(Wifi) : Connecting to WiFi ");
+    Serial.println(ssid);
+    WiFi.begin(ssid.c_str(), password.c_str());
     wifi_timeout = millis();
     while (millis() - wifi_timeout < 5000) {
         if(WiFi.status() == WL_CONNECTED){
             Serial.println("(Wifi) : Connected to WiFi");
-            return true;
+            result = true;
+            break;
         }
     }
     if(WiFi.status() != WL_CONNECTED){
         Serial.println("(Wifi) : Failed to connect to WiFi");
-        return false;
+        result = false;
     }
-    
+
+    return result;    
 }
 
 bool SIM_init() {
 
-    //(!)buatkan fungsi khusus untuk mux(!)
-    digitalWrite(mux_EN, HIGH);
-    digitalWrite(mux_A1, HIGH);
-    digitalWrite(mux_A0, LOW);
+    setMux(mux_SIM7670);
+    
+    //wake up sim7670
+    digitalWrite(SIM7670_K_PIN, LOW);
+    delay(100);
+    digitalWrite(SIM7670_K_PIN, HIGH);
   
     Serial.println("(SIM7060) : Inisialisasi SIM7060");
     if (!modem.restart()) {
@@ -53,7 +59,8 @@ bool SIM_init() {
 
 void start_internet(){
     if(!SIM_init()){
-        if(!connectWiFi(configData.wifi_ssid, configData.wifi_password)){
+        //if(!connectWiFi(configData.wifi_ssid, configData.wifi_password))
+        if(!connectWiFi("ssid", "pass")){
             //(!)Error Code wifi no connected, no connection
             //(!) Run FIFO
         }

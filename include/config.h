@@ -6,10 +6,14 @@
 #include <SD.h>
 #include "globalDef.h"
 
-extern File file;
-extern config_data configData;
 
-bool load_config(const char* filename, config_data &configData);
-void createDefaultConfig();
+class Config{
+    private:
+        File file;
+    public:
+        bool load(const char* filename, config_data &configData);
+        void createDefault(config_data &config);
+
+};
 
 #endif

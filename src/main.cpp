@@ -24,6 +24,8 @@ MPU9250 mpu;
 ADXL314 adxl;
 Datalogger logger;
 MQTT mqtt;
+Config config;
+Status status;
 
 
 
@@ -54,10 +56,10 @@ void Core0(void * parameter) {
         }
 
         if(!mqtt.publish(masterData_core1)){
-          Serial.println("(MQTT) : Failed to publish data for device ckDasiat4E0bQ2DuD2wr");
+          Serial.println("(MQTT) : Failed to publish data");
         }
 
-        iteration_1000_ms_core1 = 0;
+        iteration_1000_ms = 0;
       }
 
 
@@ -125,16 +127,22 @@ void setup() {
 
   Serial.begin(115200);
   SerialAT.begin(115200, SERIAL_8N1, RX2, TX2, false);
-  // inspector.log("INFO", "Serial", "Serial1 and Serial2 initialized!");
 
    //init SPI SD Card
   if (!SD.begin(CS_PIN)) { 
     Serial.println("(SD CARD) : SD Card tidak terdeteksi");
   }
   else{
-    inspector.create_log();
-    inspector.log("INFO", "SD Card", "SD Card Initialized!");
+    //inspector.create_log();
     Serial.println("(SD CARD) : SD Card terdeteksi");
+    status.SD = true;
+    if(inspector.create_log()){
+      inspector.log("INFO", "SD Card", "SD Card Initialized!");
+      Serial.println("(SD CARD) : sytem_log created!");
+    }
+    else{
+      Serial.println("(SD CARD) : sytem_log failed");
+    }   
   }
 
   
@@ -145,8 +153,13 @@ void setup() {
   //init GPIO
   pinMode(mux_A1, OUTPUT);
   pinMode(mux_A0, OUTPUT);
-  pinMode(mux_EN, OUTPUT);
+  pinMode(SIM7670_K_PIN, OUTPUT);
+  // pinMode(SIM7670_S_PIN, OUTPUT); //io2 not useable
+  // pinMode(DECODER_A, OUTPUT);
+  // pinMode(DECODER_B, OUTPUT); //io7 not useable
+  // pinMode(DECODER_C, OUTPUT); //io8 not useable
 
+  //testDecoder();
 
   //create semaphore
   xSemaphore = xSemaphoreCreateMutex();
@@ -155,14 +168,16 @@ void setup() {
       return;
   }
 
-  //init config file
-  if(!load_config("/config.txt", configData)){
-    createDefaultConfig();
+  // init config file
+  if(!config.load("/config.txt", configData)){
+    config.createDefault(configData);
     inspector.log("INFO", "Config", "config file not found, default config created!");
+    Serial.println("(config file) : config.txt not found, default config created!");
   }
   else{
     inspector.log("INFO", "Config", "config file loaded!");
   }
+
 
   //start_internet();
   if(!SIM_init()){
@@ -174,30 +189,42 @@ void setup() {
     }
     else{
       inspector.log("INFO", "Internet", "wifi connected!");
+      status.WIFI = true;
     }
   }
   else{
     inspector.log("INFO", "Internet", "SIM connected!");
+    status.SIM = true;
   }
 
+
   //checking firmware
-  if(!isFirmwareUpdate()){
-    downloadFirmware();
-    inspector.log("INFO", "Firmware", "Firmware is not update downloading new firmware!");
-    //(!) update firmware
+  if((status.SIM || status.WIFI) && status.SD){
+    if(!isFirmwareUpdate()){
+      downloadFirmware();
+      inspector.log("INFO", "Firmware", "Firmware is not update downloading new firmware!");
+      //(!) update firmware
+    }
+    else{
+      Serial.print("Firmware version : ");
+      Serial.println(checkFirmwareVersion());
+      inspector.log("INFO", "Firmware", "Firmware version : " + String(checkFirmwareVersion()));
+    }
   }
   else{
-    Serial.print("Firmware version : ");
-    Serial.println(checkFirmwareVersion());
-    inspector.log("INFO", "Firmware", "Firmware version : " + String(checkFirmwareVersion()));
+    Serial.println("(Firmware) : No Internet Connection or SD Card not detected!");
   }
+  
 
   // init_mpu9250();
   if(mpu.begin()){
     inspector.log("INFO", "MPU9250", "MPU9250 initialized!");
+    Serial.println("(MPU) : MPU Initialized");
+    status.MPU = true;
   }
   else{
     inspector.log("ERROR", "MPU9250", "MPU9250 not initialized!");
+    Serial.println("(MPU) : MPU Failed, System Stop");
     while(1);
   }
 
@@ -205,18 +232,23 @@ void setup() {
   // init_adxl314();
   if(adxl.begin()){
     inspector.log("INFO", "ADXL314", "ADXL314 initialized!");
+    Serial.println("(ADXL) : ADXL Initialized");
+    status.ADXL = true;
   }
   else{
     inspector.log("ERROR", "ADXL314", "ADXL314 not initialized!");
+    Serial.println("(ADXL) : ADXL Failed, System Stop");
     while(1);
   }
 
   if(mqtt.begin()){
     inspector.log("INFO", "MQTT", "MQTT initialized!");
+    Serial.println("(MQTT) : MQTT Initialized");
+    status.MQTT = true;
   }
   else{
     inspector.log("ERROR", "MQTT", "MQTT not initialized!");
-    while(1);
+    Serial.println("(MQTT) : MQTT Failed");
   }
 
   init_dualcore();

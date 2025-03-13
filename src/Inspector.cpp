@@ -6,18 +6,15 @@ bool Inspector::create_log(){
             file = SD.open(log_path, FILE_WRITE);
             log("INFO", "inspector", "system log created!");
             if(file){
-                inspector_stat = true;
                 return true;
             }
             else{
-                inspector_stat = false;
                 Serial.println("(inspector) : Failed to create system.log, check SD card!");
                 return false;
             }
         }
         else{
             Serial.println("(inspector) : Failed to create system.log, check SD card!");
-            inspector_stat = false;
             return false;
         }
     }
@@ -31,10 +28,10 @@ bool Inspector::create_log(){
     file.close();
 }
 
-void Inspector::log(String status, String func, String message){
-    if(inspector_stat){
+void Inspector::log(String state, String func, String message){
+    if(status.SD){
         String time_stamp = String(millis()/1000);
-        String msg = status + " (" + time_stamp + ") " + func + " : " + message;
+        String msg = state + " (" + time_stamp + ") " + func + " : " + message;
         file = SD.open(log_path, FILE_APPEND);
         file.println(msg);
         file.close();
